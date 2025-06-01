@@ -1,5 +1,4 @@
 use http::StatusCode;
-use itertools::Itertools;
 use worker::{D1Type, Response, RouteContext};
 
 use crate::{
@@ -86,7 +85,7 @@ pub async fn add_book(ctx: RouteContext<()>, isbn: &str) -> worker::Result<Respo
             .iter_mut()
             .for_each(|author| *author = normalize_name(author));
 
-        let _args: Vec<D1Type> = authors.iter().map(|author| D1Type::Text(&author)).collect();
+        let _args: Vec<D1Type> = authors.iter().map(|author| D1Type::Text(author)).collect();
         let author_args: Vec<&D1Type> = _args.iter().collect();
 
         let query_insert_authors = d1
@@ -122,7 +121,7 @@ pub async fn add_book(ctx: RouteContext<()>, isbn: &str) -> worker::Result<Respo
             Ok(results) => results
                 .into_iter()
                 .flat_map(|result| result.results::<AuthorsResponse>())
-                .flat_map(|v| v)
+                .flatten()
                 .collect(),
             Err(err) => {
                 tracing::error!("Failed to fetch authors: {}", err);
