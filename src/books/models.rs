@@ -18,7 +18,6 @@ pub struct Volume {
     pub etag: String,
     pub self_link: String,
     pub volume_info: VolumeInfo,
-    // saleInfo, accessInfo, searchInfo など、今回は使わないフィールドは省略
 }
 
 /// volumeInfo 内の書籍情報

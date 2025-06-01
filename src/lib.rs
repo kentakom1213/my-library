@@ -8,6 +8,7 @@ use worker::{event, Context, Env, Request, Response, Router};
 
 mod books;
 mod database;
+mod utility;
 
 #[event(start)]
 fn start() {
@@ -29,15 +30,14 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> worker::Result<Response
     Router::new()
         .get("/", |_, _| Response::ok("hello"))
         .get_async("/book/:isbn", |_req, ctx| async move {
-            if let Some(isbn) = ctx.param("isbn") {
-                return books::get_book_by_isbn(isbn).await;
+            if let Some(isbn) = ctx.param("isbn").cloned() {
+                return database::add_book(ctx, &isbn).await;
             }
             Response::error("Bad Request", StatusCode::BAD_REQUEST.as_u16())
         })
-        .get_async(
-            "/books",
-            |_req, ctx| async move { database::get_books(ctx).await },
-        )
+        .get_async("/books", |_req, ctx| async move {
+            database::get_books(ctx).await
+        })
         .run(req, env)
         .await
 }

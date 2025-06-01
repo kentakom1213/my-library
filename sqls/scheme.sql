@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS authors;
 CREATE TABLE authors (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     -- 著者ID (Primary Key)
-    name_ VARCHAR(255) NOT NULL -- 著者名
+    name_ VARCHAR(255) UNIQUE NOT NULL -- 著者名
 );
 -- books テーブルの作成
 CREATE TABLE books (
@@ -17,7 +17,7 @@ CREATE TABLE books (
     -- タイトル
     published_date DATE,
     -- 出版年月日
-    isbn VARCHAR(255) UNIQUE,
+    isbn VARCHAR(255) UNIQUE NOT NULL,
     -- ISBN (国際標準図書番号) - UNIQUE制約を追加して一意性を保証
     thumbnail_url VARCHAR(255),
     -- サムネイルURL
