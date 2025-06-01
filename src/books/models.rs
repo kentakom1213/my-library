@@ -26,7 +26,7 @@ pub struct Volume {
 #[serde(rename_all = "camelCase")]
 pub struct VolumeInfo {
     pub title: String,
-    pub authors: Option<Vec<String>>, // 著者情報は存在しない場合もあるのでOption
+    pub authors: Option<Vec<String>>,
     pub published_date: Option<String>,
     pub description: Option<String>,
     pub industry_identifiers: Option<Vec<IndustryIdentifier>>,
