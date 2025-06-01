@@ -6,7 +6,7 @@ use crate::database::models;
 /// booksに保存されている書籍情報の一覧を取得する
 pub async fn get_books(ctx: RouteContext<()>) -> worker::Result<Response> {
     // データベースに接続
-    let d1 = ctx.d1("DB")?;
+    let d1 = ctx.env.d1("DB")?;
 
     // クエリ
     let statement = d1.prepare("SELECT * FROM books");

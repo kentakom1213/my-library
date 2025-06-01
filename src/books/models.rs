@@ -26,8 +26,10 @@ pub struct Volume {
 pub struct VolumeInfo {
     pub title: String,
     pub authors: Option<Vec<String>>,
-    pub published_date: Option<String>,
-    pub description: Option<String>,
+    #[serde(default)]
+    pub published_date: String,
+    #[serde(default)]
+    pub description: String,
     pub industry_identifiers: Option<Vec<IndustryIdentifier>>,
     pub image_links: Option<ImageLinks>,
     pub language: String,

@@ -36,7 +36,7 @@ pub async fn add_book(ctx: RouteContext<()>, isbn: &str) -> worker::Result<Respo
     };
 
     // データベースを取得
-    let d1 = ctx.d1("DB")?;
+    let d1 = ctx.env.d1("DB")?;
 
     // ===== 1. 本を挿入 =====
     let query_insert_book = d1
