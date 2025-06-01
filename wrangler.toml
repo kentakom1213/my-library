@@ -1,11 +1,6 @@
-name = "my-library"
+name = "my-library2"
 main = "build/worker/shim.mjs"
 compatibility_date = "2025-06-01"
 
 [build]
 command = "cargo install -q worker-build && worker-build --release"
-
-[[d1_databases]]
-binding = "DB" # i.e. available in your Worker on env.DB
-database_name = "my-library"
-database_id = "9ba869d4-5138-41b8-9a1f-040ee417783b"

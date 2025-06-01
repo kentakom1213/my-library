@@ -1,25 +1,19 @@
-use axum::{routing::get, Router};
-use tower_service::Service;
-use worker::{event, Context, Env, HttpRequest};
+use worker::{event, Context, Env, Request, Response, Router};
 
 mod books;
 
-fn router() -> Router {
-    Router::new()
-        .route("/", get(root))
-        .route("/books/isbn/:isbn", get(books::get_book_by_isbn))
-}
-
 #[event(fetch)]
-async fn fetch(
-    req: HttpRequest,
-    _env: Env,
-    _ctx: Context,
-) -> worker::Result<axum::http::Response<axum::body::Body>> {
+async fn fetch(req: Request, env: Env, _ctx: Context) -> worker::Result<Response> {
     console_error_panic_hook::set_once();
-    Ok(router().call(req).await?)
-}
 
-pub async fn root() -> &'static str {
-    "Hello Axum!"
+    Router::new()
+        .get("/", |_, _| Response::ok("hello"))
+        .get_async("/book/:isbn", |_req, ctx| async move {
+            if let Some(isbn) = ctx.param("isbn") {
+                return books::get_book_by_isbn(isbn).await;
+            }
+            Response::error("Bad Request", 400)
+        })
+        .run(req, env)
+        .await
 }
