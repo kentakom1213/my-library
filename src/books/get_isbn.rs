@@ -1,3 +1,4 @@
+use http::StatusCode;
 use reqwest::Client;
 use worker::Response;
 
@@ -25,30 +26,29 @@ pub async fn get_book_by_isbn(isbn: &str) -> worker::Result<Response> {
             if resp.status().is_success() {
                 // レスポンスをJSONとしてパース
                 match resp.json::<BooksApiResponse>().await {
-                    Ok(BooksApiResponse {
-                        items: Some(items), ..
-                    }) if items.len() == 1 => {
-                        tracing::debug!("items[0]:{:#?}", items[0]);
+                    Ok(api_response) => {
                         // 成功した場合はJSONレスポンスを返す
-                        worker::Response::from_json(&items)
-                    }
-                    Ok(_) => {
-                        tracing::warn!("No book found for ISBN: {}", isbn);
-                        worker::Response::error("Book not found", 404)
+                        worker::Response::from_json(&api_response)
                     }
                     Err(err) => {
                         tracing::error!("Failed to parse JSON: {}", err);
-                        worker::Response::error("Internal Server Error", 500)
+                        worker::Response::error(
+                            "Internal Server Error",
+                            StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
+                        )
                     }
                 }
             } else {
                 tracing::error!("API request failed with status: {}", resp.status());
-                worker::Response::error("Not Found", 404)
+                worker::Response::error("Not Found", StatusCode::NOT_FOUND.as_u16())
             }
         }
         Err(err) => {
             tracing::error!("Request error: {}", err);
-            worker::Response::error("Internal Server Error", 500)
+            worker::Response::error(
+                "Internal Server Error",
+                StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
+            )
         }
     }
 }
