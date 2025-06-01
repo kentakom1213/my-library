@@ -9,3 +9,7 @@ command = "cargo install -q worker-build && worker-build --release"
 binding = "DB"
 database_name = "my-library"
 database_id = "9ba869d4-5138-41b8-9a1f-040ee417783b"
+
+# wrangler.toml (wrangler v3.88.0^)
+[observability.logs]
+enabled = true
