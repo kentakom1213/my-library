@@ -35,7 +35,6 @@ pub struct VolumeInfo {
     pub preview_link: Option<String>,
     pub info_link: Option<String>,
     pub canonical_volume_link: Option<String>,
-    // 他にもたくさんのフィールドがありますが、今回はよく使うものだけ抜粋
 }
 
 /// industryIdentifiers 内の ISBN 情報

@@ -25,9 +25,16 @@ pub async fn get_book_by_isbn(isbn: &str) -> worker::Result<Response> {
             if resp.status().is_success() {
                 // レスポンスをJSONとしてパース
                 match resp.json::<BooksApiResponse>().await {
-                    Ok(api_response) => {
+                    Ok(BooksApiResponse {
+                        items: Some(items), ..
+                    }) if items.len() == 1 => {
+                        tracing::debug!("items[0]:{:#?}", items[0]);
                         // 成功した場合はJSONレスポンスを返す
-                        worker::Response::from_json(&api_response)
+                        worker::Response::from_json(&items)
+                    }
+                    Ok(_) => {
+                        tracing::warn!("No book found for ISBN: {}", isbn);
+                        worker::Response::error("Book not found", 404)
                     }
                     Err(err) => {
                         tracing::error!("Failed to parse JSON: {}", err);
