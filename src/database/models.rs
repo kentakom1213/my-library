@@ -26,3 +26,22 @@ pub struct AuthorsResponse {
     #[serde(alias = "name_")]
     pub name: String,
 }
+
+#[derive(Debug, Serialize)]
+pub struct BookAuthorsResponse {
+    pub id: String,
+    pub title: String,
+    pub published_date: String,
+    pub isbn: String,
+    pub thumbnail_url: String,
+    #[serde(alias = "description_")]
+    pub description: String,
+    pub authors: Vec<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct BookAuthorsIDResponse {
+    pub book_id: String,
+    #[serde(alias = "name_")]
+    pub name: String,
+}
