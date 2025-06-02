@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use reqwest::Client;
 
 use crate::books::models::BooksApiResponse;
@@ -16,6 +18,7 @@ pub async fn get_book_by_isbn(isbn: &str) -> Result<BooksApiResponse, &'static s
     let response = Client::new()
         .get(&url)
         .header("Accept", "application/json")
+        .timeout(Duration::from_millis(1000))
         .send()
         .await;
 
@@ -39,8 +42,8 @@ pub async fn get_book_by_isbn(isbn: &str) -> Result<BooksApiResponse, &'static s
             }
         }
         Err(err) => {
-            tracing::error!("Request error: {}", err);
-            Err("Request Error")
+            tracing::error!("Google Books API Request error: {}", err);
+            Err("Google Books API Request Error")
         }
     }
 }

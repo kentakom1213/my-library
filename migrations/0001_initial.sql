@@ -27,7 +27,7 @@ CREATE TABLE books (
 CREATE TABLE book_authors (
     book_id VARCHAR(255) NOT NULL,
     -- 書籍ID
-    author_id VARCHAR(255) NOT NULL,
+    author_id INTEGER NOT NULL,
     -- 著者ID
     PRIMARY KEY (book_id, author_id),
     -- 複合主キー

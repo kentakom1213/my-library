@@ -13,7 +13,8 @@ mod utility;
 #[event(start)]
 fn start() {
     let fmt_layer = tracing_subscriber::fmt::layer()
-        .with_ansi(true)
+        .with_ansi(false)
+        // 日本時間に設定
         .with_timer(UtcTime::rfc_3339())
         .with_writer(MakeConsoleWriter);
     let perf_layer = performance_layer().with_details_from_fields(Pretty::default());
@@ -29,7 +30,7 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> worker::Result<Response
 
     Router::new()
         .get("/", |_, _| Response::ok("hello"))
-        .get_async("/book/:isbn", |_req, ctx| async move {
+        .post_async("/book/:isbn", |_req, ctx| async move {
             if let Some(isbn) = ctx.param("isbn").cloned() {
                 return database::add_book(ctx, &isbn).await;
             }

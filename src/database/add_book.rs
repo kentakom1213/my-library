@@ -9,7 +9,10 @@ use crate::{
 
 pub async fn add_book(ctx: RouteContext<()>, isbn: &str) -> worker::Result<Response> {
     // 書籍情報を取得
-    let book_info = books::get_book_by_isbn(isbn).await?;
+    let book_info = match books::get_book_by_isbn(isbn).await {
+        Ok(info) => info,
+        Err(err) => return Response::error(err, StatusCode::TOO_MANY_REQUESTS.as_u16()),
+    };
 
     // 1冊の場合に限定
     let book = match book_info.total_items {
