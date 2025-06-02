@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::utility::deserialize_published_date_from_any;
+
 /// APIからの全体レスポンス
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")] // JSONのcamelCaseをRustのsnake_caseにマッピング
@@ -26,7 +28,7 @@ pub struct Volume {
 pub struct VolumeInfo {
     pub title: String,
     pub authors: Option<Vec<String>>,
-    #[serde(default)]
+    #[serde(deserialize_with = "deserialize_published_date_from_any", default)]
     pub published_date: String,
     #[serde(default)]
     pub description: String,

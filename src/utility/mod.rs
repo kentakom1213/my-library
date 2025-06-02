@@ -1,4 +1,5 @@
-/// 文字列から半角/全角のスペースを削除
-pub fn normalize_name(name: &str) -> String {
-    name.chars().filter(|c| !c.is_whitespace()).collect()
-}
+mod custom_deserializer;
+mod modify_name;
+
+pub use custom_deserializer::deserialize_published_date_from_any;
+pub use modify_name::normalize_name;
