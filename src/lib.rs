@@ -10,7 +10,7 @@ mod books;
 mod database;
 mod utility;
 
-const ARROW_ORIGIN: &str = "https://library.pwll.dev";
+const ARROW_ORIGIN: &str = "*";
 
 #[event(start)]
 fn start() {
