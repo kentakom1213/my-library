@@ -22,6 +22,8 @@ pub async fn get_book_by_isbn(isbn: &str) -> Result<BooksApiResponse, &'static s
         .send()
         .await;
 
+    dbg!(&response);
+
     match response {
         Ok(resp) => {
             if resp.status().is_success() {

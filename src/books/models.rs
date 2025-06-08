@@ -34,7 +34,7 @@ pub struct VolumeInfo {
     pub description: String,
     pub industry_identifiers: Option<Vec<IndustryIdentifier>>,
     pub image_links: Option<ImageLinks>,
-    pub language: String,
+    pub language: Option<String>,
     pub preview_link: Option<String>,
     pub info_link: Option<String>,
     pub canonical_volume_link: Option<String>,

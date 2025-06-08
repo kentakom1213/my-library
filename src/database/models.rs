@@ -15,7 +15,7 @@ pub struct BooksResponse {
     #[serde(deserialize_with = "deserialize_published_date_from_any")]
     pub published_date: String,
     pub isbn: String,
-    pub thumbnail_url: String,
+    pub thumbnail_url: Option<String>,
     #[serde(alias = "description_")]
     pub description: String,
 }
@@ -33,7 +33,7 @@ pub struct BookAuthorsResponse {
     pub title: String,
     pub published_date: String,
     pub isbn: String,
-    pub thumbnail_url: String,
+    pub thumbnail_url: Option<String>,
     #[serde(alias = "description_")]
     pub description: String,
     pub authors: Vec<String>,

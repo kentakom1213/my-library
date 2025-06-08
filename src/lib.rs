@@ -10,6 +10,8 @@ mod books;
 mod database;
 mod utility;
 
+const ARROW_ORIGIN: &str = "https://library.pwll.dev";
+
 #[event(start)]
 fn start() {
     let fmt_layer = tracing_subscriber::fmt::layer()
@@ -28,7 +30,7 @@ fn start() {
 async fn fetch(req: Request, env: Env, _ctx: Context) -> worker::Result<Response> {
     console_error_panic_hook::set_once();
 
-    Router::new()
+    let mut resp = Router::new()
         .get("/", |_, _| Response::ok("hello"))
         .post_async("/book/:isbn", |_req, ctx| async move {
             if let Some(isbn) = ctx.param("isbn").cloned() {
@@ -40,5 +42,11 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> worker::Result<Response
             database::get_books(ctx).await
         })
         .run(req, env)
-        .await
+        .await?;
+
+    // Set CORS headers
+    resp.headers_mut()
+        .append("Access-Control-Allow-Origin", ARROW_ORIGIN)?;
+
+    Ok(resp)
 }
