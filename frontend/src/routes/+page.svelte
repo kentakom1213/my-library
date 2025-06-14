@@ -1,7 +1,6 @@
 <script lang="ts">
+  import { env } from "$env/dynamic/public";
   import { onMount } from "svelte";
-
-  const API_URL = "https://my-library.kentakom1213.workers.dev/books";
 
   type Book = {
     id: string;
@@ -19,11 +18,13 @@
   let isLoading = true;
   let error: string | null = null;
 
+  const apiURL = (env.PUBLIC_BACKEND_URL || "http://127.0.0.1:8787") + "/books";
+
   // コンポーネントがマウントされた後に実行されるライフサイクル関数
   onMount(async () => {
     try {
-      // '/api/books' エンドポイントにリクエストを送信
-      const response = await fetch(API_URL);
+      // '/books' エンドポイントにリクエストを送信
+      const response = await fetch(apiURL);
 
       if (!response.ok) {
         // HTTPステータスが 200-299 以外の場合はエラーを投げる
@@ -44,15 +45,15 @@
   });
 </script>
 
-<!-- 
-  Tailwind CSSを使用する場合、ページの背景色などはグローバルに設定するのが一般的です。
-  SvelteKitの場合、src/app.htmlの<body>タグに class="bg-gray-100" を追加するか、
-  src/routes/+layout.svelte でグローバルなスタイルを適用してください。
--->
 <main class="max-w-7xl mx-auto my-8 p-4 sm:p-8 bg-white rounded-xl shadow-lg">
-  <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">
-    powell's library
-  </h1>
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-800">powell's library</h1>
+    <a
+      href="/admin"
+      class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+      >管理者ページ →</a
+    >
+  </div>
 
   {#if isLoading}
     <p class="text-center text-lg text-gray-500 py-12">読み込み中...</p>

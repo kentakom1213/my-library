@@ -4,7 +4,7 @@ use tracing_subscriber::{
     prelude::*,
 };
 use tracing_web::{performance_layer, MakeConsoleWriter};
-use worker::{event, Context, Env, Request, Response, Router};
+use worker::{event, Context, Cors, Env, Method, Request, Response, Router};
 
 use crate::auth::require_auth;
 
@@ -12,8 +12,6 @@ mod auth;
 mod books;
 mod database;
 mod utility;
-
-const ARROW_ORIGIN: &str = "*";
 
 #[event(start)]
 fn start() {
@@ -33,8 +31,18 @@ fn start() {
 async fn fetch(req: Request, env: Env, _ctx: Context) -> worker::Result<Response> {
     console_error_panic_hook::set_once();
 
-    let mut resp = Router::new()
+    let cors = Cors::default()
+        .with_origins([
+            // "http://localhost:8080",
+            "https://library.pwll.dev",
+            // "https://library.kentakom1213.workers.dev",
+        ])
+        .with_methods([Method::Get, Method::Post, Method::Options])
+        .with_allowed_headers(["Content-Type", "Authorization"]);
+
+    let resp = Router::new()
         .get("/", |_, _| Response::ok("hello"))
+        .options("/book/:isbn", |_, _| Response::empty())
         .post_async("/book/:isbn", |req, ctx| async move {
             // 認証情報の検証
             if let Err(e) = require_auth(&req, &ctx) {
@@ -51,11 +59,8 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> worker::Result<Response
             database::get_books(ctx).await
         })
         .run(req, env)
-        .await?;
-
-    // Set CORS headers
-    resp.headers_mut()
-        .append("Access-Control-Allow-Origin", ARROW_ORIGIN)?;
+        .await?
+        .with_cors(&cors)?;
 
     Ok(resp)
 }
