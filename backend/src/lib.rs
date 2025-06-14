@@ -6,6 +6,9 @@ use tracing_subscriber::{
 use tracing_web::{performance_layer, MakeConsoleWriter};
 use worker::{event, Context, Env, Request, Response, Router};
 
+use crate::auth::require_auth;
+
+mod auth;
 mod books;
 mod database;
 mod utility;
@@ -32,7 +35,13 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> worker::Result<Response
 
     let mut resp = Router::new()
         .get("/", |_, _| Response::ok("hello"))
-        .post_async("/book/:isbn", |_req, ctx| async move {
+        .post_async("/book/:isbn", |req, ctx| async move {
+            // 認証情報の検証
+            if let Err(e) = require_auth(&req, &ctx) {
+                tracing::warn!("Authentication failed: {e}");
+                return Response::error(e.to_string(), StatusCode::UNAUTHORIZED.as_u16());
+            }
+
             if let Some(isbn) = ctx.param("isbn").cloned() {
                 return database::add_book(ctx, &isbn).await;
             }
