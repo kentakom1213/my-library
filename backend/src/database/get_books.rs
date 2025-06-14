@@ -99,5 +99,8 @@ pub async fn get_books(ctx: RouteContext<()>) -> worker::Result<Response> {
         });
     }
 
+    // タイトルでソート
+    book_authors.sort_by(|a, b| a.title.cmp(&b.title));
+
     Response::from_json(&book_authors)
 }
