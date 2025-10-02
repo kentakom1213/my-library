@@ -59,6 +59,7 @@ pub async fn add_book(ctx: RouteContext<()>, isbn: &str) -> worker::Result<Respo
             book.volume_info
                 .image_links
                 .map(|link| link.small_thumbnail)
+                .unwrap_or_default()
                 .into(),
             book.volume_info.description.into(),
         ])?;

@@ -3,6 +3,8 @@ use worker::{Response, RouteContext};
 
 use crate::database::models::{self, BookAuthorsIDResponse, BookAuthorsResponse, BooksResponse};
 
+const DEFAULT_THUMBNAIL: &str = "/no-image.png";
+
 /// booksに保存されている書籍情報の一覧を取得する
 pub async fn get_books(ctx: RouteContext<()>) -> worker::Result<Response> {
     // データベースに接続
@@ -93,7 +95,11 @@ pub async fn get_books(ctx: RouteContext<()>) -> worker::Result<Response> {
             title,
             published_date,
             isbn,
-            thumbnail_url,
+            thumbnail_url: thumbnail_url.map(|s| {
+                s.is_empty()
+                    .then_some(DEFAULT_THUMBNAIL.to_string())
+                    .unwrap_or(s)
+            }),
             description,
             authors: matched_authors,
         });
