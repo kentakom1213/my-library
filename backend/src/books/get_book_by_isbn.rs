@@ -11,7 +11,7 @@ const API_BASE_URL: &str = "https://www.googleapis.com/books/v1/volumes";
 /// ISBNを使ってGoogle Books APIから書籍情報を取得するハンドラ
 pub async fn get_book_by_isbn(isbn: &str) -> Result<BooksApiResponse, &'static str> {
     // URLを生成
-    let url = format!("{}?q=isbn:{}", API_BASE_URL, isbn);
+    let url = format!("{API_BASE_URL}?q=isbn:{isbn}");
 
     console_debug!("Fetching from Google Books API: {}", url);
 

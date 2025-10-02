@@ -96,9 +96,11 @@ pub async fn get_books(ctx: RouteContext<()>) -> worker::Result<Response> {
             published_date,
             isbn,
             thumbnail_url: thumbnail_url.map(|s| {
-                s.is_empty()
-                    .then_some(DEFAULT_THUMBNAIL.to_string())
-                    .unwrap_or(s)
+                if s.is_empty() {
+                    DEFAULT_THUMBNAIL.to_string()
+                } else {
+                    s
+                }
             }),
             description,
             authors: matched_authors,
