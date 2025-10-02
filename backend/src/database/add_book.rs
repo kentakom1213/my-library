@@ -1,5 +1,5 @@
 use http::StatusCode;
-use worker::{D1Type, Response, RouteContext};
+use worker::{console_error, console_log, console_warn, D1Type, Response, RouteContext};
 
 use crate::{
     books,
@@ -17,7 +17,7 @@ pub async fn add_book(ctx: RouteContext<()>, isbn: &str) -> worker::Result<Respo
     // 1冊の場合に限定
     let book = match book_info.total_items {
         0 => {
-            tracing::warn!("No book found for this ISBN.");
+            console_warn!("No book found for this ISBN.");
             return Response::from_json(&AddBookResponse {
                 message: "No book found for this ISBN.".to_string(),
                 isbn: None,
@@ -30,7 +30,7 @@ pub async fn add_book(ctx: RouteContext<()>, isbn: &str) -> worker::Result<Respo
             .next()
             .expect("Some item should be contained."),
         _ => {
-            tracing::warn!("Several books corresponded to this ISBN.");
+            console_warn!("Several books corresponded to this ISBN.");
             return Response::from_json(&AddBookResponse {
                 message: "Several books corresponded to this ISBN.".to_string(),
                 isbn: None,
@@ -67,7 +67,7 @@ pub async fn add_book(ctx: RouteContext<()>, isbn: &str) -> worker::Result<Respo
     // クエリを実行
     // 失敗した場合，エラーを返す
     if let Err(err) = query_insert_book.run().await {
-        tracing::error!("Failed to insert book: {}", err);
+        console_error!("Failed to insert book: {}", err);
         // 原因の特定
         if err.to_string().contains("Error: UNIQUE constraint failed") {
             return Response::from_json(&AddBookResponse {
@@ -104,7 +104,7 @@ pub async fn add_book(ctx: RouteContext<()>, isbn: &str) -> worker::Result<Respo
             .batch_bind(author_args.clone())?;
 
         if let Err(err) = d1.batch(query_insert_authors).await {
-            tracing::error!("Failed to insert authors: {}", err);
+            console_error!("Failed to insert authors: {}", err);
             return Response::error(
                 "Internal Server Error",
                 StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
@@ -128,7 +128,7 @@ pub async fn add_book(ctx: RouteContext<()>, isbn: &str) -> worker::Result<Respo
                 .flatten()
                 .collect(),
             Err(err) => {
-                tracing::error!("Failed to fetch authors: {}", err);
+                console_error!("Failed to fetch authors: {}", err);
                 return Response::error(
                     "Internal Server Error",
                     StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
@@ -139,7 +139,7 @@ pub async fn add_book(ctx: RouteContext<()>, isbn: &str) -> worker::Result<Respo
         vec![]
     };
 
-    tracing::info!("authors: {:?}", authors);
+    console_log!("authors: {:?}", authors);
 
     // ===== 3. 本と著者の関連を挿入 =====
     if !authors.is_empty() {
@@ -160,7 +160,7 @@ pub async fn add_book(ctx: RouteContext<()>, isbn: &str) -> worker::Result<Respo
             .batch_bind(book_authors.iter().collect::<Vec<_>>())?;
 
         if let Err(err) = d1.batch(query_insert_book_authors).await {
-            tracing::error!("Failed to insert book-authors relation: {}", err);
+            console_error!("Failed to insert book-authors relation: {}", err);
             return Response::error(
                 "Internal Server Error",
                 StatusCode::INTERNAL_SERVER_ERROR.as_u16(),

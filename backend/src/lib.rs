@@ -4,7 +4,7 @@ use tracing_subscriber::{
     prelude::*,
 };
 use tracing_web::{performance_layer, MakeConsoleWriter};
-use worker::{event, Context, Cors, Env, Method, Request, Response, Router};
+use worker::{console_warn, event, Context, Cors, Env, Method, Request, Response, Router};
 
 use crate::auth::require_auth;
 
@@ -46,7 +46,7 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> worker::Result<Response
         .post_async("/book/:isbn", |req, ctx| async move {
             // 認証情報の検証
             if let Err(e) = require_auth(&req, &ctx) {
-                tracing::warn!("Authentication failed: {e}");
+                console_warn!("Authentication failed: {e}");
                 return Response::error(e.to_string(), StatusCode::UNAUTHORIZED.as_u16());
             }
 

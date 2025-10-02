@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use reqwest::Client;
+use worker::{console_debug, console_error, console_log};
 
 use crate::books::models::BooksApiResponse;
 
@@ -12,7 +13,7 @@ pub async fn get_book_by_isbn(isbn: &str) -> Result<BooksApiResponse, &'static s
     // URLを生成
     let url = format!("{}?q=isbn:{}", API_BASE_URL, isbn);
 
-    tracing::debug!("Fetching from Google Books API: {}", url);
+    console_debug!("Fetching from Google Books API: {}", url);
 
     // reqwestを使ってAPIを呼び出す
     let response = Client::new()
@@ -30,21 +31,21 @@ pub async fn get_book_by_isbn(isbn: &str) -> Result<BooksApiResponse, &'static s
                 // レスポンスをJSONとしてパース
                 match resp.json::<BooksApiResponse>().await {
                     Ok(api_response) => {
-                        tracing::info!("result: {:#?}", api_response);
+                        console_log!("result: {:#?}", api_response);
                         Ok(api_response)
                     }
                     Err(err) => {
-                        tracing::error!("Failed to parse JSON: {}", err);
+                        console_error!("Failed to parse JSON: {}", err);
                         Err("Failed to parse JSON")
                     }
                 }
             } else {
-                tracing::error!("API request failed with status: {}", resp.status());
+                console_error!("API request failed with status: {}", resp.status());
                 Err("API Not Found")
             }
         }
         Err(err) => {
-            tracing::error!("Google Books API Request error: {}", err);
+            console_error!("Google Books API Request error: {}", err);
             Err("Google Books API Request Error")
         }
     }

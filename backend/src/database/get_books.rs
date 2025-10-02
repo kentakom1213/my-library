@@ -1,5 +1,5 @@
 use http::StatusCode;
-use worker::{Response, RouteContext};
+use worker::{console_error, Response, RouteContext};
 
 use crate::database::models::{self, BookAuthorsIDResponse, BookAuthorsResponse, BooksResponse};
 
@@ -28,7 +28,7 @@ pub async fn get_books(ctx: RouteContext<()>) -> worker::Result<Response> {
     let books = match result.results::<models::BooksResponse>() {
         Ok(res) => res,
         Err(err) => {
-            tracing::error!("Failed to fetch books: {}", err);
+            console_error!("Failed to fetch books: {}", err);
             return Response::error(
                 "Internal Server Error",
                 StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
@@ -57,7 +57,7 @@ pub async fn get_books(ctx: RouteContext<()>) -> worker::Result<Response> {
     let authors = match result.results::<BookAuthorsIDResponse>() {
         Ok(res) => res,
         Err(err) => {
-            tracing::error!("Failed to fetch authors: {}", err);
+            console_error!("Failed to fetch authors: {}", err);
             return Response::error(
                 "Internal Server Error",
                 StatusCode::INTERNAL_SERVER_ERROR.as_u16(),

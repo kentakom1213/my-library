@@ -1,13 +1,13 @@
 //! 認証関係の実装
 
-use worker::{Request, RouteContext};
+use worker::{console_error, Request, RouteContext};
 
 pub fn require_auth(req: &Request, ctx: &RouteContext<()>) -> worker::Result<()> {
     // 環境変数から正しいトークンを取得
     let expected_token = match ctx.env.secret("API_TOKEN") {
         Ok(token) => token.to_string(),
         Err(e) => {
-            tracing::error!("'API_TOKEN' secret not configured: {e}");
+            console_error!("'API_TOKEN' secret not configured: {e}");
             return Err(worker::Error::from("Server configuration error."));
         }
     };
